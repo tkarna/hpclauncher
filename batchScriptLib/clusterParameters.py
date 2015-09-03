@@ -3,6 +3,7 @@ HPC cluster setup.
 
 Tuomas Karna 2015-09-02
 """
+import os
 
 
 class clusterSetup(object):
@@ -38,6 +39,11 @@ class clusterSetup(object):
         metadata.update(self.kwargs)
         # update with user input
         metadata.update(kwargs)
+        # prepend logFile with logFileDir
+        if 'logFile' in metadata and 'logFileDir' in metadata:
+            metadata['logFile'] = os.path.join(metadata['logFileDir'],
+                                               metadata['logFile'])
+
         content = self.scriptPattern.format(**metadata)
         # do again in case some tags are made out of other tags
         content = content.format(**metadata)
@@ -64,6 +70,7 @@ class slurmSetup(clusterSetup):
         defaultPattern = """#!/bin/bash
 #SBATCH -J {jobName}
 #SBATCH -o {logFile}.o%j
+#SBATCH -N {nnode}
 #SBATCH -n {nproc}
 #SBATCH -p {queue}
 #SBATCH -t {hours}:{minutes}:{seconds}

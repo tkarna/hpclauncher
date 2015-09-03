@@ -29,12 +29,14 @@ class test_clusterParamenters(testBase):
 
         treq = timeRequest(12, 30, 10)
         j = batchJob(c, jobName='pyjob', queue='normal', nproc=12, nthread=8,
-                     timeReq=treq, logFile='log', parentJobOk='1001')
+                     nnode=2, timeReq=treq,
+                     logFileDir='logDir', logFile='log', parentJobOk='1001')
         j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
         out = j.generateScript()
         correct_output = """#!/bin/bash
 #SBATCH -J pyjob
-#SBATCH -o log.o%j
+#SBATCH -o logDir/log.o%j
+#SBATCH -N 2
 #SBATCH -n 12
 #SBATCH -p normal
 #SBATCH -t 12:30:10
@@ -43,7 +45,7 @@ class test_clusterParamenters(testBase):
 #SBATCH --mail-type=end
 #SBATCH -A TG445
 #SBATCH --dependency=afterok:1001
-mpiexec -n 8 python runSome.py -r runLola &>> log_pyjob
+mpiexec -n 8 python runSome.py -r runLola &>> logDir/log_pyjob
 wait"""
         self.assertStringEqual(correct_output, out)
 
@@ -52,7 +54,7 @@ wait"""
 
         treq = timeRequest(12, 30, 10)
         j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, timeReq=treq, logFile='log')
-        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
+        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', runTag='runLola')
         out = j.generateScript()
         correct_output = """#!/bin/bash
 #SBATCH -J yamljob
@@ -64,7 +66,7 @@ wait"""
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH -A TG-OCENNNNNN
-ibrun tacc_affinity python runSome.py -r runLola &>> log_yamljob
+ibrun tacc_affinity python runSome.py -r runLola
 wait"""
         self.assertStringEqual(correct_output, out)
 
@@ -74,13 +76,15 @@ wait"""
         treq = timeRequest(12, 30, 10)
         j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, nthread=8,
                      timeReq=treq, logFile='log')
-        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
+        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}',
+                        logFile='log_{jobName}', runTag='runLola',
+                        redirectMode='replace')
         out = j.generateScript()
         correct_output = """#!/bin/bash
 #$ -cwd
 #$ -N yamljob
-#$ -o log.out
-#$ -e log.err
+#$ -o /tmp/logs/log.out
+#$ -e /tmp/logs/log.err
 #$ -q normal
 #$ -pe orte 12
 #$ -M glassJoe@stccmop.org
@@ -88,7 +92,7 @@ wait"""
 #$ -m ea
 #$ -j
 #$ -V
-mpirun -n 8 python runSome.py -r runLola &>> log_yamljob
+mpirun -n 8 python runSome.py -r runLola &> /tmp/logs/log_yamljob
 wait"""
         self.assertStringEqual(correct_output, out)
 
@@ -106,13 +110,13 @@ wait"""
 #PBS -l mppwidth=12
 #PBS -l walltime=12:30:10
 #PBS -N yamljob
-#PBS -o log.$PBS_JOBID.out
-#PBS -e log.$PBS_JOBID.err
+#PBS -o log/log.$PBS_JOBID.out
+#PBS -e log/log.$PBS_JOBID.err
 #PBS -M SaraLee@stccmop.org
 #PBS -A mNNNN
 #PBS -m ea
 #PBS -V
-aprun -n 12 python runSome.py -r runLola &>> log_yamljob
+aprun -n 12 python runSome.py -r runLola &>> log/log_yamljob
 wait"""
         self.assertStringEqual(correct_output, out)
 

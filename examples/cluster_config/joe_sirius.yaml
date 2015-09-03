@@ -1,6 +1,6 @@
 userEmail: glassJoe@stccmop.org
 userAccountNb: j007
-logFileDir: log
+logFileDir: /tmp/logs
 submitExec: qsub
 mpiExec: mpirun -n {nthread}  # number of threads will be substuted
 nCoresSocket: 4  # TODO are these needed?

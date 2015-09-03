@@ -5,6 +5,7 @@ Job contains multiple tasks.
 Tuomas Karna 2015-09-02
 """
 import task
+import os
 
 
 class batchJob(object):
@@ -33,7 +34,7 @@ class batchJob(object):
             self.kwargs['minutes'] = timeReq.getMinuteString()
             self.kwargs['seconds'] = timeReq.getSecondString()
         self.clusterParams = clusterParams
-        self.commands = []
+        self.tasks = []
 
     def appendTask(self, task, threaded=False):
         """
@@ -43,7 +44,7 @@ class batchJob(object):
         if threaded:
             task = task.copy()
             task.threaded = True
-        self.commands.append(task)
+        self.tasks.append(task)
 
     def appendNewTask(self, *args, **kwargs):
         """
@@ -61,13 +62,16 @@ class batchJob(object):
         allArgs.update(self.clusterParams.kwargs)
         allArgs.update(self.kwargs)
         footer = ''
-        for c in self.commands:
+        for c in self.tasks:
             # all possible kwargs
             d = dict(allArgs)
             d.update(c.kwargs)
             # use 'nproc' by default if 'nthread' is not defined
             if 'nproc' in d:
                 d.setdefault('nthread', d['nproc'])
+            # prepend logFile with logFileDir
+            if 'logFile' in d and 'logFileDir' in d:
+                d['logFile'] = os.path.join(d['logFileDir'], d['logFile'])
             # substitute to command, twice to allow tags in tags
             s = c.getCommand() + '\n'
             s = s.format(**d)

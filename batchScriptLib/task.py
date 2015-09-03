@@ -19,6 +19,7 @@ class batchTask(object):
         self.threaded = threaded
         self.redirectMode = redirectMode
         self.kwargs = kwargs
+        self.kwargs['logFile'] = self.logFile
 
     def copy(self):
         """Get a deep copy of this task"""
@@ -28,7 +29,8 @@ class batchTask(object):
         """
         Returns the command of this task.
 
-        Appends redirection to log file and/or ampersand for threading if needed.
+        Appends redirection to log file and/or ampersand for threading
+        if needed.
         """
         full_cmd = self.cmd
         if self.redirectMode == 'append':
@@ -36,7 +38,7 @@ class batchTask(object):
         elif self.redirectMode == 'replace':
             redirOp = '&>'
         if self.logFile:
-            full_cmd += ' ' + redirOp + ' ' + self.logFile
+            full_cmd += ' ' + redirOp + ' ' + '{logFile}'
         if self.threaded:
             full_cmd += ' &'
         return full_cmd
