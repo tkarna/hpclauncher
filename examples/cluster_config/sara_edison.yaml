@@ -1,0 +1,23 @@
+userEmail: SaraLee@stccmop.org
+userAccountNb: mNNNN
+logFileDir: log
+submitExec: qsub
+mpiExec: aprun -n {nproc}
+nCoresProc: 12
+nCoresNode: 24
+resourcemanager: pbs
+scriptPattern: |
+    #!/bin/bash
+    #PBS -q {queue}
+    #PBS -l mppwidth={nproc}
+    #PBS -l walltime={hours}:{minutes}:{seconds}
+    #PBS -N {jobName}
+    #PBS -o {logFile}.$PBS_JOBID.out
+    #PBS -e {logFile}.$PBS_JOBID.err
+    #PBS -M {userEmail}
+    #PBS -A {userAccountNb}
+    #PBS -W depend=afterany:{parentJobAny}
+    #PBS -W depend=afterok:{parentJobOk}
+    #PBS -m ea
+    #PBS -V
+runDir: $PBS_O_WORKDIR

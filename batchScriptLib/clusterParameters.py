@@ -70,9 +70,9 @@ class slurmSetup(clusterSetup):
 #SBATCH --mail-user={userEmail}
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
-#SBATCH -A {accountNb}
+#SBATCH -A {userAccountNb}
 #SBATCH --dependency=afterany:{parentJobAny}
-#SBATCH --dependency=afterok:{parentJobOK}
+#SBATCH --dependency=afterok:{parentJobOk}
 """
         if scriptPattern is None:
             scriptPattern = defaultPattern

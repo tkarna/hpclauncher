@@ -6,6 +6,7 @@ Tuomas Karna 2015-09-02
 """
 import task
 
+
 class batchJob(object):
     """
     An object that represents a batch job, that can contain multiple tasks.
@@ -22,7 +23,7 @@ class batchJob(object):
         self.necessaryParameters = ['jobName',
                                     'queue',
                                     'nproc',
-                                   ]
+                                    ]
         for k in self.necessaryParameters:
             if k not in kwargs or kwargs.get(k) is None:
                 raise Exception('missing job parameter: ' + k)
@@ -69,7 +70,7 @@ class batchJob(object):
             s = s.format(**d)
             s = s.format(**d)
             footer += s
-        content = header + '\n' + footer
+        content = header + footer
         content += 'wait\n'
         return content
 
