@@ -15,28 +15,29 @@ import subprocess
 import os
 import sys
 
-import batchScriptLib.job as job
+import job
+import task
+import yamlInterface
+import clusterParameters
 
 
-def getJobForSingleTask(t, queue, nproc, timeReq, jobName=None, logFile=None,
-                        runDirectory='', parentJob=None, parentMode='ok'):
+def getClusterParametersFromYAML(yamlFile):
     """
-    Returns a batch job that only excecutes this task.
+    Parses a yaml file and returns a clusterSetup object
     """
-    if jobName is None:
-        if t.jobName is None:
-            raise Exception('jobName must be given')
-        else:
-            jobName = t.jobName
-    if logFile is None:
-        if t.logFile is None:
-            raise Exception('logFile must be given')
-        else:
-            logFile = t.logFile
-    dir = str(runDirectory)
-    return job.batchJob(jobName, queue, nproc, timeReq,
-                        logFile, command=t.getCommand(), runDirectory=dir,
-                        parentJob=parentJob, parentMode=parentMode)
+    kwargs = yamlInterface.readYamlFile(yamlFile)
+    c = clusterParameters.clusterSetup(**kwargs)
+    return c
+
+
+def parseJobsFromYAML(yamlFile):
+    """
+    Parses a yaml file and returns a list of task objects
+    """
+    raise NotImplementedError('this feature has not been implemented yet')
+    # TODO must parse jobs, tasks, populate commands with kwargs, handle deps
+    kwargs = yamlInterface.readYamlFile(yamlFile)
+    t = task.batchJob(**kwargs)
 
 
 class timeRequest(relativedelta.relativedelta):
@@ -59,13 +60,26 @@ class timeRequest(relativedelta.relativedelta):
         return '{0:02d}:{1:02d}:{2:02d}'.format(
             self.hours + day_hours, self.minutes, self.seconds)
 
+    def getHourString(self):
+        day_hours = self.days*24
+        hours = '{0:02d}'.format(self.hours + day_hours)
+        return hours
 
-def _parseJobID(sbatch_output):
+    def getMinuteString(self):
+        minutes = '{0:02d}'.format(self.minutes)
+        return minutes
+
+    def getSecondString(self):
+        seconds = '{0:02d}'.format(self.seconds)
+        return seconds
+
+
+def _parseJobID(launcher_output):
     """
-    Returns jobID of the launched runs by parsing sbatch output.
+    Returns jobID of the launched runs by parsing submission exec output.
     Output needs to be grabbed from stdout.
     """
-    lines = sbatch_output.split('\n')
+    lines = launcher_output.split('\n')
     target = 'Submitted batch job '
     for line in lines:
         if line.find(target) == 0:
@@ -73,39 +87,46 @@ def _parseJobID(sbatch_output):
     raise Exception('Could not parse sbatch output for job id')
 
 
-def _launchJob(name, content, directory=None, testOnly=False, verbose=False):
+def _launchJob(name, content, submitExec, directory=None,
+               testOnly=False, verbose=False):
     """
     Writes given batch script content to a temp file and launches the run.
     Returns jobID of the started job.
     If directory given, starts job in that directory.
     """
     if testOnly:
+        # print to stdout and return
         print content
         return 0
     elif verbose:
         print content
     if directory:
+        # change to runDir, store current dir
         if verbose:
             print 'chdir', directory
         curDir = os.getcwd()
         os.chdir(directory)
+    # write out temp submission file
     subfile = 'batch_' + name + '.sub'
     if verbose:
         print 'writing to', subfile
     fid = open(subfile, 'w')
     fid.write(content)
     fid.close()
+    # submit file
     try:
         if verbose:
-            print 'launching', launcher, subfile
-        output = subprocess.check_output([launcher, subfile])
+            print 'launching', submitExec, subfile
+        output = subprocess.check_output([submitExec, subfile])
     except Exception as e:
-        print e.output
+        print e
         raise e
     if directory:
+        # change back to currect directory
         if verbose:
             print 'chdir', curDir
         os.chdir(curDir)
+    # print launcher output to stdout
     print output
     jobID = _parseJobID(output)
     print 'Parsed Job ID:', jobID
@@ -116,7 +137,7 @@ def launchJob(job, testOnly=False, verbose=False):
     """
     Lauches given job and returns the jobID number.
     """
-    name = job.jobName
+    name = job.kwargs['jobName']
     content = job.generateScript()
-    directory = job.runDirectory
+    directory = job.kwargs['jobName']
     return _launchJob(name, content, directory, testOnly, verbose)
