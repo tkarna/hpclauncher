@@ -10,7 +10,7 @@ scriptPattern: |
     #!/bin/bash
     #SBATCH -J {jobName}
     #SBATCH -o {logFile}.o%j
-    #SBATCH -N {nnodes}
+    #SBATCH -N {nnode}
     #SBATCH -n {nproc}
     #SBATCH -p {queue}
     #SBATCH -t {hours}:{minutes}:{seconds}

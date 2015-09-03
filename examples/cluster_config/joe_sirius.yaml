@@ -2,7 +2,7 @@ userEmail: glassJoe@stccmop.org
 userAccountNb: j007
 logFileDir: log
 submitExec: qsub
-mpiExec: mpirun -pe orte {nproc}  # number of procs will be substuted
+mpiExec: mpirun -n {nthread}  # number of threads will be substuted
 nCoresSocket: 4  # TODO are these needed?
 nCoresNode: 8  # TODO are these needed?
 resourceManager: sge
@@ -13,6 +13,7 @@ scriptPattern: |
     #$ -o {logFile}.out
     #$ -e {logFile}.err
     #$ -q {queue}
+    #$ -pe orte {nproc}
     #$ -M {userEmail}
     #$ -A {userAccountNb}
     #$ --dependency=afterany:{parentJobAny}

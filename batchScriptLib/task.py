@@ -5,12 +5,14 @@ Tuomas Karna 2015-09-02
 """
 import copy
 
+
 class batchTask(object):
     """
     A single task, representable as a bash command.
     Tasks can be added to batchJob objects.
     """
-    def __init__(self, command, threaded=False, logFile=None, redirectMode='append', **kwargs):
+    def __init__(self, command, threaded=False, logFile=None,
+                 redirectMode='append', **kwargs):
         # rm trailing whitespace
         self.cmd = command.strip()
         self.logFile = logFile

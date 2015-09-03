@@ -2,7 +2,7 @@ userEmail: SaraLee@stccmop.org
 userAccountNb: mNNNN
 logFileDir: log
 submitExec: qsub
-mpiExec: aprun -n {nproc}
+mpiExec: aprun -n {nthread}
 nCoresProc: 12
 nCoresNode: 24
 resourcemanager: pbs

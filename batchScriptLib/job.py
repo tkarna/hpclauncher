@@ -65,6 +65,9 @@ class batchJob(object):
             # all possible kwargs
             d = dict(allArgs)
             d.update(c.kwargs)
+            # use 'nproc' by default if 'nthread' is not defined
+            if 'nproc' in d:
+                d.setdefault('nthread', d['nproc'])
             # substitute to command, twice to allow tags in tags
             s = c.getCommand() + '\n'
             s = s.format(**d)

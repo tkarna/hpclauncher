@@ -23,12 +23,12 @@ class testBase(unittest.TestCase):
 class test_clusterParamenters(testBase):
 
     def test_slurm_python(self):
-        c = clusterParameters.slurmSetup(mpiExec='mpiexec -n {nproc}',
+        c = clusterParameters.slurmSetup(mpiExec='mpiexec -n {nthread}',
                                          userEmail='sir.john@yahoo.co.uk',
                                          userAccountNb='TG445')
 
         treq = timeRequest(12, 30, 10)
-        j = batchJob(c, jobName='pyjob', queue='normal', nproc=12,
+        j = batchJob(c, jobName='pyjob', queue='normal', nproc=12, nthread=8,
                      timeReq=treq, logFile='log', parentJobOk='1001')
         j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
         out = j.generateScript()
@@ -43,7 +43,7 @@ class test_clusterParamenters(testBase):
 #SBATCH --mail-type=end
 #SBATCH -A TG445
 #SBATCH --dependency=afterok:1001
-mpiexec -n 12 python runSome.py -r runLola &>> log_pyjob
+mpiexec -n 8 python runSome.py -r runLola &>> log_pyjob
 wait"""
         self.assertStringEqual(correct_output, out)
 
@@ -72,7 +72,8 @@ wait"""
         c = getClusterParametersFromYAML('../examples/cluster_config/joe_sirius.yaml')
 
         treq = timeRequest(12, 30, 10)
-        j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, timeReq=treq, logFile='log')
+        j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, nthread=8,
+                     timeReq=treq, logFile='log')
         j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
         out = j.generateScript()
         correct_output = """#!/bin/bash
@@ -81,12 +82,13 @@ wait"""
 #$ -o log.out
 #$ -e log.err
 #$ -q normal
+#$ -pe orte 12
 #$ -M glassJoe@stccmop.org
 #$ -A j007
 #$ -m ea
 #$ -j
 #$ -V
-mpirun -pe orte 12 python runSome.py -r runLola &>> log_yamljob
+mpirun -n 8 python runSome.py -r runLola &>> log_yamljob
 wait"""
         self.assertStringEqual(correct_output, out)
 
