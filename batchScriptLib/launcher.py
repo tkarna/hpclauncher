@@ -63,7 +63,7 @@ def _launchJob(name, content, submitExec, managerType, directory=None,
     return jobID
 
 
-def _parseJobID(launcher_output, managerType):
+def _parseJobID(output, managerType):
     """
     Returns jobID of the launched runs by parsing submission exec output.
     Output needs to be grabbed from stdout.
@@ -71,7 +71,7 @@ def _parseJobID(launcher_output, managerType):
     if managerType == 'slurm':
         return _parseJobID_SLURM(output)
     if managerType == 'sge':
-        rtn = parseJobID_SGE(output)
+        return _parseJobID_SGE(output)
     # not implemented yet
     return 0
 
