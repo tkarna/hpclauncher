@@ -10,6 +10,7 @@ sleepTime: 10
 # NOTE job identifier strings can be used as dependency in other runs
 job_fast_asleep:       # everything after job_ is jobName
     queue:    normal
+    logFile:  log_simple
     nproc:    1
     time:              # creates timeRequest instance
         hours:   0

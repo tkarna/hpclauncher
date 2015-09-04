@@ -1,11 +1,21 @@
-userEmail: local.guy@nowhere.near
-userAccountNb: uid1000
+# bash config example
+#
+# Here submitExec is set to `bash` so the submission script is
+# executed immediately on the host system. Unlike with a real
+# submission system the launch process will wait until the end
+# of the scipt is reached.
+#
+# To run tasks with a new thread set 'threaded=True' for each task.
+#
+userEmail: local.guy@workstati.on
 logFileDir: log
 submitExec: bash
-mpiExec: echo
+mpiExec: ""  # empty string
 resourceManager: bash
 scriptPattern: |
     #!/bin/bash
+    # NOTE this is an example bash script
+    # NOTE parsed tags are listed below but have no effect
     # -queue {queue}
     # -nproc {nproc}
     # -time {hours}:{minutes}:{seconds}

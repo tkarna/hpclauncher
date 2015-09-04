@@ -43,10 +43,15 @@ All keywords are read hierarchically from the `clusterSetup`, `job` and `task` o
 
 ## Roadmap
 
-- implement and test job dependencies
 - test runDir, test if exists first
 - create logFileDir if it doesn't exist
-- add scripts dir, add executables, install under bin/
+- write example python files (parameter sweep, scaling test)
+- update selfe example(s)
+- clean up old examples
 - add python examples with loops
+- add default cluster config file under ~/.batchScriptLib/
+- and a mechanism for setting the default
+- support environment variable BATCHSCRIPT_CLUSTER_CONF to set custom default file
+
 
 

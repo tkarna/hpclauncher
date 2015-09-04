@@ -26,14 +26,14 @@ class batchJob(object):
                                     'queue',
                                     'nproc',
                                     ]
+        # merge kwargs, ensures propagation of common params
+        kw = {}
+        kw.update(clusterParams.kwargs)
+        kw.update(kwargs)
         for k in self.necessaryParameters:
-            if kwargs.get(k) is None:
-                if clusterParams.kwargs is not None:
-                    # copy param form clusterParams
-                    kwargs[k] = clusterParams.kwargs[k]
-                else:
-                    raise Exception('missing job parameter: ' + k)
-        self.kwargs = kwargs
+            if kw.get(k) is None:
+                raise Exception('missing job parameter: ' + k)
+        self.kwargs = kw
         if timeReq:
             self.kwargs['hours'] = timeReq.getHourString()
             self.kwargs['minutes'] = timeReq.getMinuteString()

@@ -4,13 +4,14 @@
 # Globals
 # NOTE define global keywords that can be used in all jobs
 sleepTime: 10
+queue:  normal
+nproc:  1
 
 # Jobs
 # NOTE each job must begin with job_ followed by identifier string
 # NOTE job identifier strings can be used as dependency in other runs
 job_fast_asleep:       # everything after job_ is jobName
-    queue:    normal
-    nproc:    1
+    logFile:     log_simple1
     time:              # creates timeRequest instance
         hours:   0
         minutes: 2
@@ -20,9 +21,8 @@ job_fast_asleep:       # everything after job_ is jobName
         command: 'echo "sleeping" && sleep {sleepTime} && echo "{ending}"'
         ending: done   # used can define task specific tags
 
-job_more_sleeping:       # everything after job_ is jobName
-    queue:    normal
-    nproc:    1
+job_more_sleeping:     # everything after job_ is jobName
+    logFile:     log_simple2
     parentJobAny: fast_asleep
     time:              # creates timeRequest instance
         hours:   0
@@ -31,11 +31,11 @@ job_more_sleeping:       # everything after job_ is jobName
     task_1:            # tasks must have unique names beginning with task_
                        # command is required
         command: 'echo "more sleeping" && sleep {sleepTime} && echo "{ending}"'
-        ending: done   # used can define task specific tags
+        ending:  done  # used can define task specific tags
 
-job_still_sleeping:       # everything after job_ is jobName
-    queue:    normal
-    nproc:    1
+job_still_sleeping:    # everything after job_ is jobName
+    logFile:     log_simple3
+    nproc:       3     # override global nproc
     parentJobAny: more_sleeping
     time:              # creates timeRequest instance
         hours:   0
