@@ -18,12 +18,17 @@ class clusterSetup(object):
         # check for necessary parameters
         self.necessaryParameters = ['submitExec',
                                     'mpiExec',
-                                    'scriptPattern',]
+                                    'scriptPattern',
+                                    'resourceManager',
+                                    ]
         for k in self.necessaryParameters:
             if k not in kwargs or kwargs.get(k) is None:
                 raise Exception('missing cluster parameter: ' + k)
         self.scriptPattern = kwargs.pop('scriptPattern')
         self.kwargs = kwargs
+
+    def __getitem__(self, key):
+        return self.kwargs.get(key)
 
     def generateScriptHeader(self, **kwargs):
         """
@@ -31,7 +36,7 @@ class clusterSetup(object):
         """
         # parse all keywords from the pattern
         keywords = self.scriptPattern.split('{')[1:]
-        keywords = [ p.split('}')[0] for p in keywords]
+        keywords = [p.split('}')[0] for p in keywords]
         # make dict with all keywords set to placeholder
         missingTag = '--missing--'
         metadata = dict(zip(keywords, [missingTag]*len(keywords)))

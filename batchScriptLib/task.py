@@ -1,5 +1,5 @@
 """
-Representation of a single command.
+Representation of a single command that can be added to a batchJob.
 
 Tuomas Karna 2015-09-02
 """
@@ -14,12 +14,17 @@ class batchTask(object):
     def __init__(self, command, threaded=False, logFile=None,
                  redirectMode='append', **kwargs):
         # rm trailing whitespace
+        if command is None:
+            raise Exception('missing task parameter: command')
         self.cmd = command.strip()
         self.logFile = logFile
-        self.threaded = threaded
+        self.threaded = bool(threaded)
         self.redirectMode = redirectMode
         self.kwargs = kwargs
         self.kwargs['logFile'] = self.logFile
+
+    def __getitem__(self, key):
+        return self.kwargs.get(key)
 
     def copy(self):
         """Get a deep copy of this task"""

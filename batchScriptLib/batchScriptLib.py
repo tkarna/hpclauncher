@@ -8,17 +8,20 @@ runID = launchRun(nproc, timeReq, queue, runTag,
 
 Tuomas Karna 2014-09-11
 """
-
-import datetime
 from dateutil import relativedelta
-import subprocess
-import os
-import sys
 
 import job
-import task
 import yamlInterface
 import clusterParameters
+
+
+def printNestedDict(d, indent=0):
+    for key, value in d.iteritems():
+        if isinstance(value, dict):
+            print '    ' * indent + str(key) + ':'
+            printNestedDict(value, indent+1)
+        else:
+            print '    ' * (indent) + str(key) + ': ' + str(value)
 
 
 def getClusterParametersFromYAML(yamlFile):
@@ -30,21 +33,67 @@ def getClusterParametersFromYAML(yamlFile):
     return c
 
 
-def parseJobsFromYAML(yamlFile):
+def parseJobsFromYAML(yamlFile, clusterParams):
     """
-    Parses a yaml file and returns a list of task objects
+    Parses a yaml file and returns a list of job objects
     """
-    raise NotImplementedError('this feature has not been implemented yet')
-    # TODO must parse jobs, tasks, populate commands with kwargs, handle deps
+    # read file to nested OrderedDict
     kwargs = yamlInterface.readYamlFile(yamlFile)
-    t = task.batchJob(**kwargs)
+    # global tags: at highest level, if not starting with job_
+    globKeys = [k for k in kwargs if k[:4] != 'job_']
+    globals = dict([(k, kwargs[k]) for k in kwargs if k in globKeys])
+    # global tags may be used in job or task defs, store in clusterParams
+    clusterParams.kwargs.update(globals)
+    # all other sub-dicts are jobs
+    jobs = dict([(k, kwargs[k]) for k in kwargs if k not in globKeys])
+    # parse dict to jobs
+    jobList = []
+    for jobKey in jobs:
+        j = _parseJobFromDict(jobKey, jobs[jobKey], clusterParams)
+        jobList.append(j)
+    return jobList
+
+
+def submitJobs(jobList):
+    """
+    submits the given list of jobs.
+    """
+    pass
+
+
+def _parseJobFromDict(jobKey, d, clusterParams):
+    """
+    Creates a job from a nested OrderedDict
+    """
+    # parse jobName from the key
+    jobName = '_'.join(jobKey.split('_')[1:])
+    # parse timeRequest if any
+    timeReq = d.pop('time')
+    if timeReq is not None:
+        timeReq = timeRequest(timeReq['hours'],
+                              timeReq['minutes'],
+                              timeReq['seconds'])
+    # all keys starting with task_ indicate a task spec
+    taskKeys = [k for k in d if k[:5] == 'task_']
+    tasks = dict([(k, d[k]) for k in taskKeys])
+    # all remaining keys are job arguments
+    job_kwargs = dict([(k, d[k]) for k in d if k not in taskKeys])
+    job_kwargs['jobName'] = jobName
+    # create job
+    j = job.batchJob(clusterParams, timeReq, **job_kwargs)
+    for tkey in tasks:
+        task_kwargs = tasks[tkey]
+        # create task
+        command = task_kwargs.pop('command')
+        j.appendNewTask(command, **task_kwargs)
+    return j
 
 
 class timeRequest(relativedelta.relativedelta):
     """
     Simple object that represents requested duration of a batch job.
     """
-    def __init__(self, hours, minutes, seconds):
+    def __init__(self, hours=0, minutes=0, seconds=0):
         relativedelta.relativedelta.__init__(self,
                                              hours=hours,
                                              minutes=minutes,
@@ -54,6 +103,9 @@ class timeRequest(relativedelta.relativedelta):
     def fromString(cls, hhmmss):
         h, m, s = hhmmss.split(':')
         return cls(int(h), int(m), int(s))
+
+    def __str__(self):
+        return self.getString()
 
     def getString(self):
         day_hours = self.days*24
@@ -74,70 +126,3 @@ class timeRequest(relativedelta.relativedelta):
         return seconds
 
 
-def _parseJobID(launcher_output):
-    """
-    Returns jobID of the launched runs by parsing submission exec output.
-    Output needs to be grabbed from stdout.
-    """
-    lines = launcher_output.split('\n')
-    target = 'Submitted batch job '
-    for line in lines:
-        if line.find(target) == 0:
-            return int(line.split()[-1])
-    raise Exception('Could not parse sbatch output for job id')
-
-
-def _launchJob(name, content, submitExec, directory=None,
-               testOnly=False, verbose=False):
-    """
-    Writes given batch script content to a temp file and launches the run.
-    Returns jobID of the started job.
-    If directory given, starts job in that directory.
-    """
-    if testOnly:
-        # print to stdout and return
-        print content
-        return 0
-    elif verbose:
-        print content
-    if directory:
-        # change to runDir, store current dir
-        if verbose:
-            print 'chdir', directory
-        curDir = os.getcwd()
-        os.chdir(directory)
-    # write out temp submission file
-    subfile = 'batch_' + name + '.sub'
-    if verbose:
-        print 'writing to', subfile
-    fid = open(subfile, 'w')
-    fid.write(content)
-    fid.close()
-    # submit file
-    try:
-        if verbose:
-            print 'launching', submitExec, subfile
-        output = subprocess.check_output([submitExec, subfile])
-    except Exception as e:
-        print e
-        raise e
-    if directory:
-        # change back to currect directory
-        if verbose:
-            print 'chdir', curDir
-        os.chdir(curDir)
-    # print launcher output to stdout
-    print output
-    jobID = _parseJobID(output)
-    print 'Parsed Job ID:', jobID
-    return jobID
-
-
-def launchJob(job, testOnly=False, verbose=False):
-    """
-    Lauches given job and returns the jobID number.
-    """
-    name = job.kwargs['jobName']
-    content = job.generateScript()
-    directory = job.kwargs['jobName']
-    return _launchJob(name, content, directory, testOnly, verbose)

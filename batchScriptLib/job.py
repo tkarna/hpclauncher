@@ -1,6 +1,7 @@
 """
-Representation of a job than can be submitted to job managers.
-Job contains multiple tasks.
+Representation of a job than can be submitted to target machine queue manager.
+
+Job contains a clusterSetup object and a list of tasks.
 
 Tuomas Karna 2015-09-02
 """
@@ -36,6 +37,9 @@ class batchJob(object):
         self.clusterParams = clusterParams
         self.tasks = []
 
+    def __getitem__(self, key):
+        return self.kwargs.get(key)
+
     def appendTask(self, task, threaded=False):
         """
         Appends given task in the current batch job.
@@ -70,7 +74,7 @@ class batchJob(object):
             if 'nproc' in d:
                 d.setdefault('nthread', d['nproc'])
             # prepend logFile with logFileDir
-            if 'logFile' in d and 'logFileDir' in d:
+            if d.get('logFile') is not None and d.get('logFileDir') is not None:
                 d['logFile'] = os.path.join(d['logFileDir'], d['logFile'])
             # substitute to command, twice to allow tags in tags
             s = c.getCommand() + '\n'

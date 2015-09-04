@@ -2,7 +2,7 @@
 # 
 userEmail: killaMike@stccmop.org
 userAccountNb: TG-OCENNNNNN
-resourceManager: slurm  # NOTE this is not used
+resourceManager: slurm
 submitExec: sbatch
 mpiExec: ibrun tacc_affinity
 # NOTE submission script patten should have all possible rows; unused rows will be removed

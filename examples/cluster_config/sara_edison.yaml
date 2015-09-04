@@ -5,7 +5,7 @@ submitExec: qsub
 mpiExec: aprun -n {nthread}
 nCoresProc: 12
 nCoresNode: 24
-resourcemanager: pbs
+resourceManager: pbs
 scriptPattern: |
     #!/bin/bash
     #PBS -q {queue}
