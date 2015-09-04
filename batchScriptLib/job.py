@@ -27,8 +27,12 @@ class batchJob(object):
                                     'nproc',
                                     ]
         for k in self.necessaryParameters:
-            if k not in kwargs or kwargs.get(k) is None:
-                raise Exception('missing job parameter: ' + k)
+            if kwargs.get(k) is None:
+                if clusterParams.kwargs is not None:
+                    # copy param form clusterParams
+                    kwargs[k] = clusterParams.kwargs[k]
+                else:
+                    raise Exception('missing job parameter: ' + k)
         self.kwargs = kwargs
         if timeReq:
             self.kwargs['hours'] = timeReq.getHourString()
