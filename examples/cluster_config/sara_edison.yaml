@@ -6,6 +6,7 @@ mpiExec: aprun -n {nthread}
 nCoresProc: 12
 nCoresNode: 24
 resourceManager: pbs
+runDir: $PBS_O_WORKDIR
 scriptPattern: |
     #!/bin/bash
     #PBS -q {queue}
@@ -20,4 +21,3 @@ scriptPattern: |
     #PBS -W depend=afterok:{parentJobOk}
     #PBS -m ea
     #PBS -V
-runDir: $PBS_O_WORKDIR

@@ -9,10 +9,12 @@ runID = launchRun(nproc, timeReq, queue, runTag,
 Tuomas Karna 2014-09-11
 """
 from dateutil import relativedelta
+from collections import OrderedDict
 
 import job
 import yamlInterface
 import clusterParameters
+import launcher
 
 
 def printNestedDict(d, indent=0):
@@ -41,11 +43,11 @@ def parseJobsFromYAML(yamlFile, clusterParams):
     kwargs = yamlInterface.readYamlFile(yamlFile)
     # global tags: at highest level, if not starting with job_
     globKeys = [k for k in kwargs if k[:4] != 'job_']
-    globals = dict([(k, kwargs[k]) for k in kwargs if k in globKeys])
+    globals = OrderedDict([(k, kwargs[k]) for k in kwargs if k in globKeys])
     # global tags may be used in job or task defs, store in clusterParams
     clusterParams.kwargs.update(globals)
     # all other sub-dicts are jobs
-    jobs = dict([(k, kwargs[k]) for k in kwargs if k not in globKeys])
+    jobs = OrderedDict([(k, kwargs[k]) for k in kwargs if k not in globKeys])
     # parse dict to jobs
     jobList = []
     for jobKey in jobs:
@@ -54,11 +56,28 @@ def parseJobsFromYAML(yamlFile, clusterParams):
     return jobList
 
 
-def submitJobs(jobList):
+def submitJobs(jobList, testOnly=False, verbose=False):
     """
-    submits the given list of jobs.
+    Submits the given list of jobs.
     """
-    pass
+    if not isinstance(jobList, list):
+        jobList = [jobList]
+    # keep track of launched job names and ids
+    parentTags = ['parentJobOk', 'parentJobAny']
+    parentJobIDs = {}
+    # launch jobs
+    for j in jobList:
+        # substitute parentJob with actual job id
+        for tag in parentTags:
+            # parentJobs can only be defined in batchJob
+            parentName = j.kwargs.get(tag)
+            if parentName is not None:
+                if parentName in parentJobIDs:
+                    j.kwargs[tag] = parentJobIDs[parentName]
+                else:
+                    raise Exception('unknown parentJob: ' + parentName)
+        id = launcher.launchJob(j, testOnly=testOnly, verbose=verbose)
+        parentJobIDs[j['jobName']] = id
 
 
 def _parseJobFromDict(jobKey, d, clusterParams):

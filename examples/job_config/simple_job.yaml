@@ -1,5 +1,5 @@
 # Example of a simple run with no dependencies
-# =======================================
+# ============================================
 
 # Globals
 # NOTE define global keywords that can be used in all jobs
@@ -19,4 +19,4 @@ job_fast_asleep:       # everything after job_ is jobName
                        # command is required
         command: 'echo "sleeping" && sleep {sleepTime} && echo "{ending}"'
         ending: done   # used can define task specific tags
-        
+

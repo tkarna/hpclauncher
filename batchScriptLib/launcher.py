@@ -58,7 +58,7 @@ def _launchJob(name, content, submitExec, managerType, directory=None,
         os.chdir(curDir)
     # print launcher output to stdout
     print output
-    jobID = _parseJobID(output)
+    jobID = _parseJobID(output, managerType)
     print 'Parsed Job ID:', jobID
     return jobID
 
