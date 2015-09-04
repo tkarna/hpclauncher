@@ -16,8 +16,8 @@ scriptPattern: |
     #$ -pe orte {nproc}
     #$ -M {userEmail}
     #$ -A {userAccountNb}
-    #$ --dependency=afterany:{parentJobAny}
-    #$ --dependency=afterok:{parentJobOk}
+    #$ -hold_jid {parentJobAny}
+    #$ -hold_jid {parentJobOk}
     #$ -m ea
-    #$ -j
+    #$ -j y
     #$ -V
