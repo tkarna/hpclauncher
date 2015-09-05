@@ -5,6 +5,7 @@ Job contains a clusterSetup object and a list of tasks.
 
 Tuomas Karna 2015-09-02
 """
+from clusterParameters import clusterParams
 import task
 import os
 
@@ -27,7 +28,7 @@ class batchJob(object):
     """
     An object that represents a batch job, that can contain multiple tasks.
     """
-    def __init__(self, clusterParams, timeReq=None, **kwargs):
+    def __init__(self, timeReq=None, **kwargs):
         """
         Arguments
         ---------
@@ -42,7 +43,7 @@ class batchJob(object):
                                     ]
         # merge kwargs, ensures propagation of common params
         kw = {}
-        kw.update(clusterParams.kwargs)
+        kw.update(clusterParams.getArgs())
         kw.update(kwargs)
         for k in self.necessaryParameters:
             if kw.get(k) is None:
@@ -52,7 +53,6 @@ class batchJob(object):
             self.kwargs['hours'] = timeReq.getHourString()
             self.kwargs['minutes'] = timeReq.getMinuteString()
             self.kwargs['seconds'] = timeReq.getSecondString()
-        self.clusterParams = clusterParams
         self.tasks = []
 
     def __getitem__(self, key):
@@ -79,9 +79,9 @@ class batchJob(object):
         """
         Generates content of the batch script.
         """
-        header = self.clusterParams.generateScriptHeader(**self.kwargs)
+        header = clusterParams.generateScriptHeader(**self.kwargs)
         allArgs = {}
-        allArgs.update(self.clusterParams.kwargs)
+        allArgs.update(clusterParams.getArgs())
         allArgs.update(self.kwargs)
         footer = ''
         for c in self.tasks:

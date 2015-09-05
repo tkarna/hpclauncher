@@ -11,22 +11,16 @@ Tuomas Karna 2014-09-11
 from dateutil import relativedelta
 from collections import OrderedDict
 
+import clusterParameters
+from clusterParameters import clusterParams
+from clusterParameters import CLUSTERPARAM_ENV_VAR, CLUSTERPARAM_USERFILE
+
 import job
 import yamlInterface
-import clusterParameters
 import launcher
 
 
-def getClusterParametersFromYAML(yamlFile):
-    """
-    Parses a yaml file and returns a clusterSetup object
-    """
-    kwargs = yamlInterface.readYamlFile(yamlFile)
-    c = clusterParameters.clusterSetup(**kwargs)
-    return c
-
-
-def parseJobsFromYAML(yamlFile, clusterParams):
+def parseJobsFromYAML(yamlFile):
     """
     Parses a yaml file and returns a list of job objects
     """
@@ -36,13 +30,13 @@ def parseJobsFromYAML(yamlFile, clusterParams):
     globKeys = [k for k in kwargs if k[:4] != 'job_']
     globals = OrderedDict([(k, kwargs[k]) for k in kwargs if k in globKeys])
     # global tags may be used in job or task defs, store in clusterParams
-    clusterParams.kwargs.update(globals)
+    clusterParams.getArgs().update(globals)
     # all other sub-dicts are jobs
     jobs = OrderedDict([(k, kwargs[k]) for k in kwargs if k not in globKeys])
     # parse dict to jobs
     jobList = []
     for jobKey in jobs:
-        j = _parseJobFromDict(jobKey, jobs[jobKey], clusterParams)
+        j = _parseJobFromDict(jobKey, jobs[jobKey])
         jobList.append(j)
     return jobList
 
@@ -71,7 +65,7 @@ def submitJobs(jobList, testOnly=False, verbose=False):
         parentJobIDs[j['jobName']] = id
 
 
-def _parseJobFromDict(jobKey, d, clusterParams):
+def _parseJobFromDict(jobKey, d):
     """
     Creates a job from a nested OrderedDict
     """
@@ -90,7 +84,7 @@ def _parseJobFromDict(jobKey, d, clusterParams):
     job_kwargs = dict([(k, d[k]) for k in d if k not in taskKeys])
     job_kwargs['jobName'] = jobName
     # create job
-    j = job.batchJob(clusterParams, timeReq, **job_kwargs)
+    j = job.batchJob(timeReq, **job_kwargs)
     for tkey in tasks:
         task_kwargs = tasks[tkey]
         # create task

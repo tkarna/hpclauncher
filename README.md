@@ -43,8 +43,7 @@ All keywords are read hierarchically from the `clusterSetup`, `job` and `task` o
 
 ## Roadmap
 
-- test runDir, test if exists first
-- create logFileDir if it doesn't exist
+- if logFile present prepend submission script?
 - write example python files (parameter sweep, scaling test)
 - update selfe example(s)
 - clean up old examples

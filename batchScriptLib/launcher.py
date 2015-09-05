@@ -5,6 +5,7 @@ Tuomas Karna 2015-09-03
 """
 import os
 import subprocess
+from clusterParameters import clusterParams
 
 
 def launchJob(job, testOnly=False, verbose=False):
@@ -13,8 +14,8 @@ def launchJob(job, testOnly=False, verbose=False):
     """
     name = job['jobName']
     content = job.generateScript()
-    submitExec = job.clusterParams['submitExec']
-    managerType = job.clusterParams['resourceManager']
+    submitExec = clusterParams['submitExec']
+    managerType = clusterParams['resourceManager']
     runDir = job['runDir']
     if runDir is not None and not os.path.isdir(runDir):
         raise IOError('runDir does not exist: ' + runDir)
