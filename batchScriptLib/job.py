@@ -9,6 +9,20 @@ import task
 import os
 
 
+def createDirectory(path):
+    """
+    Creates given directory if it does not exist already.
+
+    Raises an exception if a file with the same name exists.
+    """
+    if os.path.exists(path):
+        if not os.path.isdir(path):
+            raise Exception('file with same name exists', path)
+    else:
+        os.makedirs(path)
+    return path
+
+
 class batchJob(object):
     """
     An object that represents a batch job, that can contain multiple tasks.
@@ -80,6 +94,8 @@ class batchJob(object):
             # prepend logFile with logFileDir
             if d.get('logFile') is not None and d.get('logFileDir') is not None:
                 d['logFile'] = os.path.join(d['logFileDir'], d['logFile'])
+                # ensure logFileDir exists
+                createDirectory(d['logFileDir'])
             # substitute to command, twice to allow tags in tags
             s = c.getCommand() + '\n'
             s = s.format(**d)

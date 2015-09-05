@@ -17,15 +17,6 @@ import clusterParameters
 import launcher
 
 
-def printNestedDict(d, indent=0):
-    for key, value in d.iteritems():
-        if isinstance(value, dict):
-            print '    ' * indent + str(key) + ':'
-            printNestedDict(value, indent+1)
-        else:
-            print '    ' * (indent) + str(key) + ': ' + str(value)
-
-
 def getClusterParametersFromYAML(yamlFile):
     """
     Parses a yaml file and returns a clusterSetup object

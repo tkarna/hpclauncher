@@ -6,20 +6,24 @@
 sleepTime: 10
 queue:  normal
 nproc:  1
+logFileDir: tmp_log_dir
 
 # Jobs
 # NOTE each job must begin with job_ followed by identifier string
 # NOTE job identifier strings can be used as dependency in other runs
 job_fast_asleep:       # everything after job_ is jobName
-    logFile:     log_simple1
-    time:              # creates timeRequest instance
+    logFile:  log_simple   # log file given to the queue manager
+    nproc:    1
+    time:                  # creates timeRequest instance
         hours:   0
         minutes: 2
         seconds: 0
-    task_1:            # tasks must have unique names beginning with task_
-                       # command is required
-        command: 'echo "sleeping" && sleep {sleepTime} && echo "{ending}"'
-        ending: done   # used can define task specific tags
+    task_1:                # tasks must have unique names beginning with task_
+                           # command is required
+        command: 'sleep {sleepTime} && echo "{message}"'
+        message: sleeping  # used can define new task specific tags
+        logFile: log_task1 # command output redirected here
+        redirMode: replace # replace or append
 
 job_more_sleeping:     # everything after job_ is jobName
     logFile:     log_simple2
@@ -30,8 +34,8 @@ job_more_sleeping:     # everything after job_ is jobName
         seconds: 0
     task_1:            # tasks must have unique names beginning with task_
                        # command is required
-        command: 'echo "more sleeping" && sleep {sleepTime} && echo "{ending}"'
-        ending:  done  # used can define task specific tags
+        command: 'sleep {sleepTime} && echo "{message}"'
+        message:  more sleeping
 
 job_still_sleeping:    # everything after job_ is jobName
     logFile:     log_simple3
@@ -43,5 +47,6 @@ job_still_sleeping:    # everything after job_ is jobName
         seconds: 0
     task_1:            # tasks must have unique names beginning with task_
                        # command is required
-        command: 'echo "still sleeping" && sleep {sleepTime} && echo "{ending}"'
-        ending: done   # used can define task specific tags
+        command: 'sleep {sleepTime} && echo "{message}"'
+        message:  still sleeping
+        logFile: log_task3

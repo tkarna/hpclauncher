@@ -12,14 +12,14 @@ class batchTask(object):
     Tasks can be added to batchJob objects.
     """
     def __init__(self, command, threaded=False, logFile=None,
-                 redirectMode='append', **kwargs):
+                 redirMode='append', **kwargs):
         # rm trailing whitespace
         if command is None:
             raise Exception('missing task parameter: command')
         self.cmd = command.strip()
         self.logFile = logFile
         self.threaded = bool(threaded)
-        self.redirectMode = redirectMode
+        self.redirMode = redirMode
         self.kwargs = kwargs
         self.kwargs['logFile'] = self.logFile
 
@@ -38,9 +38,9 @@ class batchTask(object):
         if needed.
         """
         full_cmd = self.cmd
-        if self.redirectMode == 'append':
+        if self.redirMode == 'append':
             redirOp = '&>>'
-        elif self.redirectMode == 'replace':
+        elif self.redirMode == 'replace':
             redirOp = '&>'
         if self.logFile:
             full_cmd += ' ' + redirOp + ' ' + '{logFile}'
