@@ -2,6 +2,45 @@
 
 Generic interface for submitting jobs to super computer queue managers.
 
+## Installation and short introduction
+
+Login to cluster and install batchScriptLib as user
+
+    python setup.py install --user
+
+Add `~/.local/bin` to your `PATH`
+
+    export PATH=~/.local/bin:$PATH
+
+Define a yaml cluster configure file and copy it under
+
+    ~/.batchScriptLib/local_cluster.yaml
+
+For example cluster parameter files see [examples/cluster_config](https://bitbucket.org/tkarna/batchscriplib/src/HEAD/examples/cluster_config/?at=master).
+Cluster configure file can also be overriden with `BATCHSCRIPTLIB_CLUSTER` environment variable.
+
+You can now submit jobs from yaml files with
+
+    submitYAMLJob.py myjob.yaml
+
+For example job files see [examples/job_config](https://bitbucket.org/tkarna/batchscriplib/src/HEAD/examples/job_config/?at=master).
+
+For testing purposes, adding `-t` will only print the submission script without submitting it.
+
+    submitYAMLJob.py myjob.yaml -t
+
+Jobs can also be created and launched from python:
+
+    from batchScriptLib import *
+    # create job. Jobs can be submitted to queue managers
+    j = batchJob(jobName='somename', queue='normal',
+                 nproc=12, timeReq=timeRequest(10, 30, 0), logFile='log_somelog')
+    # job can contain multiple tasks (commands)
+    j.appendNewTask('echo {message}', message='hello')
+    submitJobs(j, testOnly=True, verbose=False)
+
+For python examples see [examples/python](https://bitbucket.org/tkarna/batchscriplib/src/HEAD/examples/python/?at=master).
+
 ## List of common keywords
 
 ### Cluster parameters
@@ -26,7 +65,7 @@ Parameters marked in __bold__ are required to initialize `clusterSetup` object.
 
 Parameters marked in __bold__ are required to initialize `job` object.
 
-For example, to allocate 3 nodes for total 24 processes, and running a threaded task with 12 threads could be set with
+For example, to allocate 3 nodes and total 24 processes, and running a task with 12 threads could be set with
 
     mpiExec: mpiexec -n {nthread}
     nnode: 3
@@ -43,14 +82,6 @@ All keywords are read hierarchically from the `clusterSetup`, `job` and `task` o
 
 ## Roadmap
 
-- if logFile present prepend submission script?
-- write example python files (parameter sweep, scaling test)
 - update selfe example(s)
 - clean up old examples
-- add python examples with loops
-- add default cluster config file under ~/.batchScriptLib/
-- and a mechanism for setting the default
-- support environment variable BATCHSCRIPT_CLUSTER_CONF to set custom default file
-
-
 
