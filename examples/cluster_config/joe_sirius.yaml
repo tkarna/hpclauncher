@@ -9,15 +9,16 @@ resourceManager: sge
 scriptPattern: |
     #!/bin/bash
     #$ -cwd
+    #$ -j y
+    #$ -S /bin/bash
     #$ -N {jobName}
     #$ -o {logFile}.out
     #$ -e {logFile}.err
     #$ -q {queue}
     #$ -pe orte {nproc}
     #$ -M {userEmail}
+    #$ -m ea
     #$ -A {userAccountNb}
     #$ -hold_jid {parentJobAny}
     #$ -hold_jid {parentJobOk}
-    #$ -m ea
-    #$ -j y
     #$ -V
