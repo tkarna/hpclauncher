@@ -60,7 +60,9 @@ def submitJobs(jobList, testOnly=False, verbose=False):
                 if parentName in parentJobIDs:
                     j.kwargs[tag] = parentJobIDs[parentName]
                 else:
-                    raise Exception('unknown parentJob: ' + parentName)
+                    # raise Exception('unknown parentJob: ' + parentName)
+                    # assume that user has given a valid parent job ID
+                    pass
         id = launcher.launchJob(j, testOnly=testOnly, verbose=verbose)
         parentJobIDs[j['jobName']] = id
 
