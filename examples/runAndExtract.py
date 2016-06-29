@@ -6,7 +6,7 @@ Tuomas Karna 2014-09-11
 from batchScriptLib import *
 
 
-def processRun(runTag, parentJob=None, parentMode=None, testOnly=True,
+def processRun(runTag, parentjob=None, parentmode=None, testonly=True,
                verbose=False):
     print 'Setting up', runTag
 
@@ -16,12 +16,12 @@ def processRun(runTag, parentJob=None, parentMode=None, testOnly=True,
     # --- run model ---
     name = shortname
     nproc = 128
-    runDir = runTag
+    rundir = runTag
     cmd = 'ibrun tacc_affinity ./pelfe -ksp_type cg -pc_type mg\n'
     log = 'log_run'
-    job = batchJob(name, queue, nproc, timeRequest(10, 00, 0), log,
-                   runDirectory=runDir, command=cmd)
-    runID = launchJob(job, testOnly, verbose)
+    job = batchJob(name, queue, nproc, timerequest(10, 00, 0), log,
+                   rundirectory=rundir, command=cmd)
+    runID = launchJob(job, testonly, verbose)
     print 'submitted run job:', runTag, runID
 
     # --- combine ---
@@ -30,27 +30,27 @@ def processRun(runTag, parentJob=None, parentMode=None, testOnly=True,
     threads = 24
     first_stack = 1
     last_stack = 12
-    log = os.path.join(logFileDir, 'log_comb_'+shortname)
+    log = os.path.join(logfiledir, 'log_comb_'+shortname)
     t1 = taskThreadedCombine(runTag, threads, 1, 4)
     t2 = taskThreadedCombine(runTag, threads, 5, 8)
     t3 = taskThreadedCombine(runTag, threads, 9, 12)
     t1.cmd = 'ibrun -n 1 -o 0  ' + t1.cmd
     t2.cmd = 'ibrun -n 1 -o 16 ' + t2.cmd
     t3.cmd = 'ibrun -n 1 -o 32 ' + t3.cmd
-    combJob = batchJob(name, queue, nproc, timeRequest(1, 30, 0), log,
-                       parentJob=runID, parentMode='any')
+    combJob = batchJob(name, queue, nproc, timerequest(1, 30, 0), log,
+                       parentjob=runID, parentmode='any')
     combJob.appendTask(t1, threaded=True)
     combJob.appendTask(t2, threaded=True)
     combJob.appendTask(t3, threaded=True)
-    combID = launchJob(combJob, testOnly, verbose)
+    combID = launchJob(combJob, testonly, verbose)
     print 'submitted comb job:', runTag, combID
 
     # --- extract ---
     name = 'e_'+shortname
-    log = os.path.join(logFileDir, 'log_extr_'+shortname)
+    log = os.path.join(logfiledir, 'log_extr_'+shortname)
     nproc = 8
-    masterJob = batchJob(name, queue, nproc, timeRequest(5, 30, 0), log,
-                         parentJob=combID, parentMode='any')
+    masterJob = batchJob(name, queue, nproc, timerequest(5, 30, 0), log,
+                         parentjob=combID, parentmode='any')
 
     st = datetime.datetime(2012, 10, 21)
     et = datetime.datetime(2012, 11, 1)
@@ -62,7 +62,7 @@ def processRun(runTag, parentJob=None, parentMode=None, testOnly=True,
     cmdStr = command.format(runTag=runTag, start=st.strftime('%Y-%m-%d'),
                             end=et.strftime('%Y-%m-%d'))
     name = 'extrProf_'+runTag
-    log = os.path.join(logFileDir, 'log_'+name)
+    log = os.path.join(logfiledir, 'log_'+name)
     t = task(cmdStr, name, log)
     masterJob.appendTask(t, threaded=True)
 
@@ -78,7 +78,7 @@ def processRun(runTag, parentJob=None, parentMode=None, testOnly=True,
     # AUV extraction cannot be threaded (tasks must be run in order), append last
     masterJob.appendTask(taskExtractAUV(runTag), threaded=False)
 
-    extrID = launchJob(masterJob, testOnly=testOnly, verbose=verbose)
+    extrID = launchJob(masterJob, testonly=testonly, verbose=verbose)
     print 'submitted extr job:', runTag, extrID
 
 # -----------------------------------------------------------------------------
@@ -91,13 +91,13 @@ if __name__=='__main__' :
     usage = ('Usage: %prog [options] runTag\n')
 
     parser = OptionParser(usage=usage)
-    parser.add_option('-p', '--parentJob', action='store', type='string',
-                      dest='parentJob', help='Add job dependency; this job'+
+    parser.add_option('-p', '--parentjob', action='store', type='string',
+                      dest='parentjob', help='Add job dependency; this job'+
                       ' will only be executed after the parent has finished')
-    parser.add_option('-m', '--parentMode', action='store', type='string',
-                      dest='parentMode', help='', default='ok')
+    parser.add_option('-m', '--parentmode', action='store', type='string',
+                      dest='parentmode', help='', default='ok')
     parser.add_option('-t', '--test', action='store_true',
-                      dest='testOnly', help='do not launch anything, just print submission script on stdout')
+                      dest='testonly', help='do not launch anything, just print submission script on stdout')
     parser.add_option('-v', '--verbose', action='store_true',
                       dest='verbose', help='print submission script on stdout')
 
@@ -108,5 +108,5 @@ if __name__=='__main__' :
 
     runTag = args[0]
 
-    processRun(runTag, testOnly=options.testOnly, parentJob=options.parentJob,
-               parentMode=options.parentMode ,verbose=options.verbose)
+    processRun(runTag, testonly=options.testonly, parentjob=options.parentjob,
+               parentmode=options.parentmode ,verbose=options.verbose)

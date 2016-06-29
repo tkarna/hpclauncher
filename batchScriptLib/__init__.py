@@ -1,18 +1,18 @@
 
 import os
-from batchScriptLib import *
-from task import batchTask
-from job import batchJob
-from os.path import expanduser
+from batchscriptlib import *
+from .clusterparameters import CLUSTERPARAM_ENV_VAR, CLUSTERPARAM_USERFILE  # NOQA
+from task import BatchTask  # NOQA
+from job import BatchJob  # NOQA
+from os.path import expanduser  # NOQA
 
 # initialize cluster parameters
 envfile = os.environ.get(CLUSTERPARAM_ENV_VAR)
 locfile = expanduser(CLUSTERPARAM_USERFILE)
 if envfile is not None:
     # from env variable
-    clusterParams.initializeFromFile(envfile)
+    clusterparams.initialize_from_file(envfile)
 elif os.path.isfile(locfile):
     # from default user file
-    clusterParams.initializeFromFile(locfile)
+    clusterparams.initialize_from_file(locfile)
 # leave uninitialized (and defunct)
-

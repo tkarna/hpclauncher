@@ -1,24 +1,24 @@
-userEmail: glassJoe@stccmop.org
-userAccountNb: j007
-logFileDir: /tmp/logs
-submitExec: qsub
-mpiExec: mpirun -n {nthread}  # number of threads will be substuted
-nCoresSocket: 4  # TODO are these needed?
-nCoresNode: 8  # TODO are these needed?
-resourceManager: sge
-scriptPattern: |
+useremail: glassJoe@stccmop.org
+useraccountnb: j007
+logfiledir: /tmp/logs
+submitexec: qsub
+mpiexec: mpirun -n {nthread}  # number of threads will be substuted
+ncoressocket: 4  # TODO are these needed?
+ncoresnode: 8  # TODO are these needed?
+resourcemanager: sge
+scriptpattern: |
     #!/bin/bash
     #$ -cwd
     #$ -j y
     #$ -S /bin/bash
-    #$ -N {jobName}
-    #$ -o {logFile}.out
-    #$ -e {logFile}.err
+    #$ -N {jobname}
+    #$ -o {logfile}.out
+    #$ -e {logfile}.err
     #$ -q {queue}
     #$ -pe orte {nproc}
-    #$ -M {userEmail}
+    #$ -M {useremail}
     #$ -m ea
-    #$ -A {userAccountNb}
-    #$ -hold_jid {parentJobAny}
-    #$ -hold_jid {parentJobOk}
+    #$ -A {useraccountnb}
+    #$ -hold_jid {parentjobany}
+    #$ -hold_jid {parentjobok}
     #$ -V

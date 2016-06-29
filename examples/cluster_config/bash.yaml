@@ -7,21 +7,21 @@
 #
 # To run tasks with a new thread set 'threaded=True' for each task.
 #
-userEmail: local.guy@workstati.on
-logFileDir: log
-submitExec: bash
-mpiExec: ""  # empty string
-resourceManager: bash
-scriptPattern: |
+useremail: local.guy@workstati.on
+logfiledir: log
+submitexec: bash
+mpiexec: ""  # empty string
+resourcemanager: bash
+scriptpattern: |
     #!/bin/bash
     # NOTE this is an example bash script
     # NOTE parsed tags are listed below but have no effect
     # -queue {queue}
     # -nproc {nproc}
     # -time {hours}:{minutes}:{seconds}
-    # -jobName {jobName}
-    # -logFile {logFile}
-    # -userEmail {userEmail}
-    # -userAccountNb {userAccountNb}
-    # -parentJobAny {parentJobAny}
-    # -parentJobOk {parentJobOk}
+    # -jobName {jobname}
+    # -logFile {logfile}
+    # -userEmail {useremail}
+    # -userAccountNb {useraccountnb}
+    # -parentJobAny {parentjobany}
+    # -parentJobOk {parentjobok}

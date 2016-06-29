@@ -6,22 +6,22 @@ Tuomas Karna 2015-09-02
 import copy
 
 
-class batchTask(object):
+class BatchTask(object):
     """
     A single task, representable as a bash command.
     Tasks can be added to batchJob objects.
     """
-    def __init__(self, command, threaded=False, logFile=None,
-                 redirMode='append', **kwargs):
+    def __init__(self, command, threaded=False, logfile=None,
+                 redirmode='append', **kwargs):
         # rm trailing whitespace
         if command is None:
             raise Exception('missing task parameter: command')
         self.cmd = command.strip()
-        self.logFile = logFile
+        self.logfile = logfile
         self.threaded = bool(threaded)
-        self.redirMode = redirMode
+        self.redirmode = redirmode
         self.kwargs = kwargs
-        self.kwargs['logFile'] = self.logFile
+        self.kwargs['logfile'] = self.logfile
 
     def __getitem__(self, key):
         return self.kwargs.get(key)
@@ -30,7 +30,7 @@ class batchTask(object):
         """Get a deep copy of this task"""
         return copy.deepcopy(self)
 
-    def getCommand(self):
+    def get_command(self):
         """
         Returns the command of this task.
 
@@ -38,12 +38,12 @@ class batchTask(object):
         if needed.
         """
         full_cmd = self.cmd
-        if self.redirMode == 'append':
-            redirOp = '&>>'
-        elif self.redirMode == 'replace':
-            redirOp = '&>'
-        if self.logFile:
-            full_cmd += ' ' + redirOp + ' ' + '{logFile}'
+        if self.redirmode == 'append':
+            redir_op = '&>>'
+        elif self.redirmode == 'replace':
+            redir_op = '&>'
+        if self.logfile:
+            full_cmd += ' ' + redir_op + ' ' + '{logfile}'
         if self.threaded:
             full_cmd += ' &'
         return full_cmd

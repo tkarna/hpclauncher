@@ -8,7 +8,7 @@ from batchScriptLib import *
 import argparse
 
 
-def submitYamlJobs(jobFile, clusterParamsFile, testOnly=False, verbose=False):
+def submitYamlJobs(jobFile, clusterParamsFile, testonly=False, verbose=False):
     """
     Submits jobs defined in the jobFile.
     """
@@ -16,7 +16,7 @@ def submitYamlJobs(jobFile, clusterParamsFile, testOnly=False, verbose=False):
         clusterParams.initializeFromFile(clusterParamsFile)
 
     jobs = parseJobsFromYAML(jobFile)
-    submitJobs(jobs, testOnly=testOnly, verbose=verbose)
+    submitJobs(jobs, testonly=testonly, verbose=verbose)
 
 
 def parseCommandLine():
@@ -25,7 +25,7 @@ def parseCommandLine():
     parser.add_argument('-c', '--clusterParamsFile', help='Custom yaml '
                         'cluster parameter file. By default user config file '
                         'is used (if present).')
-    parser.add_argument('-t', '--testOnly', action='store_true', default=False,
+    parser.add_argument('-t', '--testonly', action='store_true', default=False,
                         help=('Do not launch anything, just print submission '
                               'script on stdout'))
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
@@ -33,7 +33,7 @@ def parseCommandLine():
     args = parser.parse_args()
 
     submitYamlJobs(args.jobFile, args.clusterParamsFile,
-                   testOnly=args.testOnly, verbose=args.verbose)
+                   testonly=args.testonly, verbose=args.verbose)
 
 
 if __name__ == '__main__':

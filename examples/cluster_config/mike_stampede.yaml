@@ -1,23 +1,23 @@
 # Example user/cluster documentation for TACC Stampede
 # 
-userEmail: killaMike@stccmop.org
-userAccountNb: TG-OCENNNNNN
-resourceManager: slurm
-submitExec: sbatch
-mpiExec: ibrun tacc_affinity
+useremail: killaMike@stccmop.org
+useraccountnb: TG-OCENNNNNN
+resourcemanager: slurm
+submitexec: sbatch
+mpiexec: ibrun tacc_affinity
 # NOTE submission script patten should have all possible rows; unused rows will be removed
-scriptPattern: |
+scriptpattern: |
     #!/bin/bash
-    #SBATCH -J {jobName}
-    #SBATCH -o {logFile}.o%j
+    #SBATCH -J {jobname}
+    #SBATCH -o {logfile}.o%j
     #SBATCH -N {nnode}
     #SBATCH -n {nproc}
     #SBATCH -p {queue}
     #SBATCH -t {hours}:{minutes}:{seconds}
-    #SBATCH --mail-user={userEmail}
+    #SBATCH --mail-user={useremail}
     #SBATCH --mail-type=begin
     #SBATCH --mail-type=end
-    #SBATCH -A {userAccountNb}
-    #SBATCH --dependency=afterany:{parentJobAny}
-    #SBATCH --dependency=afterok:{parentJobOk}
+    #SBATCH -A {useraccountnb}
+    #SBATCH --dependency=afterany:{parentjobany}
+    #SBATCH --dependency=afterok:{parentjobok}
 

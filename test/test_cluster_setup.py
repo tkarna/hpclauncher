@@ -3,16 +3,16 @@ import unittest
 import difflib
 
 
-class testBase(unittest.TestCase):
+class TestBase(unittest.TestCase):
 
-    def assertStringEqual(self, first, second):
+    def assert_string_equal(self, first, second):
         try:
             a = first.splitlines()
             b = second.splitlines()
             diff = difflib.unified_diff(a, b,
                                         fromfile='correct',
                                         tofile='generated')
-            diff = [p+'\n' for p in diff]
+            diff = [p + '\n' for p in diff]
             self.assertTrue(len(diff) == 0)
         except AssertionError as e:
             print 'string mismatch:'
@@ -20,22 +20,22 @@ class testBase(unittest.TestCase):
             raise e
 
 
-class test_clusterParamenters(testBase):
+class TestClusterParameters(TestBase):
 
     def test_slurm_python(self):
-        c = clusterParameters.slurmSetup(mpiExec='mpiexec -n {nthread}',
-                                         userEmail='sir.john@yahoo.co.uk',
-                                         userAccountNb='TG445')
-
-        treq = timeRequest(12, 30, 10)
-        j = batchJob(c, jobName='pyjob', queue='normal', nproc=12, nthread=8,
-                     nnode=2, timeReq=treq,
-                     logFileDir='logDir', logFile='log', parentJobOk='1001')
-        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
-        out = j.generateScript()
+        c = clusterparameters.SlurmSetup(mpiexec='mpiexec -n {nthread}',
+                                         useremail='sir.john@yahoo.co.uk',
+                                         useraccountnb='TG445')
+        clusterparams.initialize_from(c)
+        treq = TimeRequest(12, 30, 10)
+        j = BatchJob(jobname='pyjob', queue='normal', nproc=12, nthread=8,
+                     nnode=2, timereq=treq,
+                     logfiledir='somedir', logfile='log', parentjobok='1001')
+        j.append_new_task('{mpiexec} python runSome.py -r {runTag}', logfile='log_{jobname}', runTag='run_lola')
+        out = j.generate_script()
         correct_output = """#!/bin/bash
 #SBATCH -J pyjob
-#SBATCH -o logDir/log.o%j
+#SBATCH -o somedir/log.o%j
 #SBATCH -N 2
 #SBATCH -n 12
 #SBATCH -p normal
@@ -45,17 +45,16 @@ class test_clusterParamenters(testBase):
 #SBATCH --mail-type=end
 #SBATCH -A TG445
 #SBATCH --dependency=afterok:1001
-mpiexec -n 8 python runSome.py -r runLola &>> logDir/log_pyjob
+mpiexec -n 8 python runSome.py -r run_lola &>> somedir/log_pyjob
 wait"""
-        self.assertStringEqual(correct_output, out)
+        self.assert_string_equal(correct_output, out)
 
     def test_yaml_slurm(self):
-        c = getClusterParametersFromYAML('../examples/cluster_config/mike_stampede.yaml')
-
-        treq = timeRequest(12, 30, 10)
-        j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, timeReq=treq, logFile='log')
-        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', runTag='runLola')
-        out = j.generateScript()
+        clusterparams.initialize_from_file('../examples/cluster_config/mike_stampede.yaml')
+        treq = TimeRequest(12, 30, 10)
+        j = BatchJob(jobname='yamljob', queue='normal', nproc=12, timereq=treq, logfile='log')
+        j.append_new_task('{mpiexec} python runSome.py -r {runTag}', runTag='run_lola')
+        out = j.generate_script()
         correct_output = """#!/bin/bash
 #SBATCH -J yamljob
 #SBATCH -o log.o%j
@@ -66,45 +65,45 @@ wait"""
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH -A TG-OCENNNNNN
-ibrun tacc_affinity python runSome.py -r runLola
+ibrun tacc_affinity python runSome.py -r run_lola
 wait"""
-        self.assertStringEqual(correct_output, out)
+        self.assert_string_equal(correct_output, out)
 
     def test_yaml_sge(self):
-        c = getClusterParametersFromYAML('../examples/cluster_config/joe_sirius.yaml')
-
-        treq = timeRequest(12, 30, 10)
-        j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, nthread=8,
-                     timeReq=treq, logFile='log')
-        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}',
-                        logFile='log_{jobName}', runTag='runLola',
-                        redirectMode='replace')
-        out = j.generateScript()
+        clusterparams.initialize_from_file('../examples/cluster_config/joe_sirius.yaml')
+        treq = TimeRequest(12, 30, 10)
+        j = BatchJob(jobname='yamljob', queue='normal', nproc=12, nthread=8,
+                     timereq=treq, logfile='log')
+        j.append_new_task('{mpiexec} python runSome.py -r {runTag}',
+                          logfile='log_{jobname}', runTag='run_lola',
+                          redirectMode='replace')
+        out = j.generate_script()
         correct_output = """#!/bin/bash
 #$ -cwd
+#$ -j y
+#$ -S /bin/bash
 #$ -N yamljob
 #$ -o /tmp/logs/log.out
 #$ -e /tmp/logs/log.err
 #$ -q normal
 #$ -pe orte 12
 #$ -M glassJoe@stccmop.org
-#$ -A j007
 #$ -m ea
-#$ -j
+#$ -A j007
 #$ -V
-mpirun -n 8 python runSome.py -r runLola &> /tmp/logs/log_yamljob
+mpirun -n 8 python runSome.py -r run_lola &>> /tmp/logs/log_yamljob
 wait"""
-        self.assertStringEqual(correct_output, out)
+        self.assert_string_equal(correct_output, out)
 
     def test_yaml_pbs(self):
         # --- yaml pbs ---
 
-        c = getClusterParametersFromYAML('../examples/cluster_config/sara_edison.yaml')
+        clusterparams.initialize_from_file('../examples/cluster_config/sara_edison.yaml')
 
-        treq = timeRequest(12, 30, 10)
-        j = batchJob(c, jobName='yamljob', queue='normal', nproc=12, timeReq=treq, logFile='log')
-        j.appendNewTask('{mpiExec} python runSome.py -r {runTag}', logFile='log_{jobName}', runTag='runLola')
-        out = j.generateScript()
+        treq = TimeRequest(12, 30, 10)
+        j = BatchJob(jobname='yamljob', queue='normal', nproc=12, timereq=treq, logfile='log')
+        j.append_new_task('{mpiexec} python runSome.py -r {runTag}', logfile='log_{jobname}', runTag='run_lola')
+        out = j.generate_script()
         correct_output = """#!/bin/bash
 #PBS -q normal
 #PBS -l mppwidth=12
@@ -116,9 +115,9 @@ wait"""
 #PBS -A mNNNN
 #PBS -m ea
 #PBS -V
-aprun -n 12 python runSome.py -r runLola &>> log/log_yamljob
+aprun -n 12 python runSome.py -r run_lola &>> log/log_yamljob
 wait"""
-        self.assertStringEqual(correct_output, out)
+        self.assert_string_equal(correct_output, out)
 
 
 if __name__ == '__main__':

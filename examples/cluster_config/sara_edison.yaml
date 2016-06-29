@@ -1,23 +1,23 @@
-userEmail: SaraLee@stccmop.org
-userAccountNb: mNNNN
-logFileDir: log
-submitExec: qsub
-mpiExec: aprun -n {nthread}
-nCoresProc: 12
-nCoresNode: 24
-resourceManager: pbs
-#runDir: $PBS_O_WORKDIR
-scriptPattern: |
+useremail: SaraLee@stccmop.org
+useraccountnb: mNNNN
+logfiledir: log
+submitexec: qsub
+mpiexec: aprun -n {nthread}
+ncoresproc: 12
+ncoresnode: 24
+resourcemanager: pbs
+#rundir: $PBS_O_WORKDIR
+scriptpattern: |
     #!/bin/bash
     #PBS -q {queue}
     #PBS -l mppwidth={nproc}
     #PBS -l walltime={hours}:{minutes}:{seconds}
-    #PBS -N {jobName}
-    #PBS -o {logFile}.$PBS_JOBID.out
-    #PBS -e {logFile}.$PBS_JOBID.err
-    #PBS -M {userEmail}
-    #PBS -A {userAccountNb}
-    #PBS -W depend=afterany:{parentJobAny}
-    #PBS -W depend=afterok:{parentJobOk}
+    #PBS -N {jobname}
+    #PBS -o {logfile}.$PBS_JOBID.out
+    #PBS -e {logfile}.$PBS_JOBID.err
+    #PBS -M {useremail}
+    #PBS -A {useraccountnb}
+    #PBS -W depend=afterany:{parentjobany}
+    #PBS -W depend=afterok:{parentjobok}
     #PBS -m ea
     #PBS -V
