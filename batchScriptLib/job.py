@@ -83,24 +83,31 @@ class batchJob(object):
         allArgs = {}
         allArgs.update(clusterParams.getArgs())
         allArgs.update(self.kwargs)
+        logdir = allArgs.get('logFileDir')
+        # prepend logFile with logFileDir
+        if logdir is not None:
+            # ensure logFileDir exists
+            createDirectory(logdir)
+            if allArgs.get('logFile') is not None:
+                # fix update job logfile
+                allArgs['logFile'] = os.path.join(logdir, allArgs['logFile'])
         footer = ''
-        for c in self.tasks:
+        for t in self.tasks:
             # all possible kwargs
             d = dict(allArgs)
-            d.update(c.kwargs)
+            d.update(t.kwargs)
             # use 'nproc' by default if 'nthread' is not defined
             if 'nproc' in d:
                 d.setdefault('nthread', d['nproc'])
-            # prepend logFile with logFileDir
-            if d.get('logFile') is not None and d.get('logFileDir') is not None:
-                d['logFile'] = os.path.join(d['logFileDir'], d['logFile'])
-                # ensure logFileDir exists
-                createDirectory(d['logFileDir'])
+            if logdir is not None:
+                # update task logfile
+                if t.logFile is not None and logdir not in t.logFile:
+                    t.logFile = os.path.join(logdir, t.logFile)
             # substitute to command, twice to allow tags in tags
-            s = c.getCommand() + '\n'
-            s = s.format(**d)
-            s = s.format(**d)
-            footer += s
+            cmd = t.getCommand() + '\n'
+            cmd = cmd.format(**d)
+            cmd = cmd.format(**d)
+            footer += cmd
         content = header + footer
         content += 'wait\n'
         return content
