@@ -1,4 +1,4 @@
-from batchScriptLib import *
+from hpclauncher import *
 import unittest
 import difflib
 

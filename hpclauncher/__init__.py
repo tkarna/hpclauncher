@@ -1,6 +1,6 @@
 
 import os
-from batchscriptlib import *
+from hpclauncher import *
 from .clusterparameters import CLUSTERPARAM_ENV_VAR, CLUSTERPARAM_USERFILE  # NOQA
 from task import BatchTask  # NOQA
 from job import BatchJob  # NOQA

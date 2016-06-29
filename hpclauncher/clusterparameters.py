@@ -8,8 +8,8 @@ import os
 from . import yaml_interface
 
 # constants for fiding cluster param file
-CLUSTERPARAM_ENV_VAR = 'BATCHSCRIPTLIB_CLUSTER'
-CLUSTERPARAM_USERFILE = '~/.batchScriptLib/local_cluster.yaml'
+CLUSTERPARAM_ENV_VAR = 'HPCLAUNCHER_CLUSTER'
+CLUSTERPARAM_USERFILE = '~/.hpclauncher/local_cluster.yaml'
 
 
 class ClusterSetup(object):

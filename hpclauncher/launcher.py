@@ -14,7 +14,7 @@ def launch_job(job, testonly=False, verbose=False):
     Lauches given job and returns the jobID number.
     """
     name = job['jobname']
-    content = job.generateScript()
+    content = job.generate_script()
     submitexec = clusterparams['submitexec']
     managertype = clusterparams['resourcemanager']
     rundir = job['rundir']
