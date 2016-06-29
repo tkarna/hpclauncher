@@ -17,13 +17,15 @@ def launchJob(job, testOnly=False, verbose=False):
     submitExec = clusterParams['submitExec']
     managerType = clusterParams['resourceManager']
     runDir = job['runDir']
+    logFile = job['logFile']
     if runDir is not None and not os.path.isdir(runDir):
         raise IOError('runDir does not exist: ' + runDir)
     return _launchJob(name, content, submitExec, managerType, runDir,
-                      testOnly, verbose)
+                      logFile, testOnly, verbose)
 
 
 def _launchJob(name, content, submitExec, managerType, runDir=None,
+               logFile=None,
                testOnly=False, verbose=False):
     """
     Writes given batch script content to a temp file and launches the run.
@@ -47,9 +49,15 @@ def _launchJob(name, content, submitExec, managerType, runDir=None,
     _writeScriptFile(subfile, content, verbose=verbose)
     # submit file
     try:
+        call = [submitExec, subfile]
         if verbose:
-            print 'excecuting "{:} {:}"'.format(submitExec, subfile)
-        output = subprocess.check_output([submitExec, subfile])
+            print 'excecuting {:}'.format(' '.join(call))
+        if managerType == 'bash' and logFile is not None:
+            with open(logFile, 'w') as logstream:
+                output = subprocess.check_call(call, stdout=logstream,
+                                               stderr=subprocess.STDOUT)
+        else:
+            output = subprocess.check_output(call)
     except Exception as e:
         print e
         raise e
