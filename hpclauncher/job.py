@@ -88,7 +88,7 @@ class BatchJob(object):
         all_args.update(clusterparams.get_args())
         all_args.update(self.kwargs)
         logdir = all_args.get('logfiledir')
-        all_args.pop('logfile')
+        all_args.pop('logfile', None)
         # prepend logfile with logfiledir
         if logdir is not None:
             # ensure logfiledir exists

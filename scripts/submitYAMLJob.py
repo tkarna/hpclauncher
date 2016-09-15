@@ -4,25 +4,25 @@ Submits jobs defined in yaml file.
 
 Tuomas Karna 2015-09-03
 """
-from batchScriptLib import *
+from hpclauncher import *
 import argparse
 
 
-def submitYamlJobs(jobFile, clusterParamsFile, testonly=False, verbose=False):
+def submitYamlJobs(jobfile, clusterparamsfile, testonly=False, verbose=False):
     """
-    Submits jobs defined in the jobFile.
+    Submits jobs defined in the jobfile.
     """
-    if clusterParamsFile is not None:
-        clusterParams.initializeFromFile(clusterParamsFile)
+    if clusterparamsfile is not None:
+        clusterparams.initialize_from_file(clusterparamsfile)
 
-    jobs = parseJobsFromYAML(jobFile)
-    submitJobs(jobs, testonly=testonly, verbose=verbose)
+    jobs = parse_jobs_from_yaml(jobfile)
+    submit_jobs(jobs, testonly=testonly, verbose=verbose)
 
 
 def parseCommandLine():
     parser = argparse.ArgumentParser()
-    parser.add_argument('jobFile', help='yaml job file')
-    parser.add_argument('-c', '--clusterParamsFile', help='Custom yaml '
+    parser.add_argument('jobfile', help='yaml job file')
+    parser.add_argument('-c', '--clusterparamsfile', help='Custom yaml '
                         'cluster parameter file. By default user config file '
                         'is used (if present).')
     parser.add_argument('-t', '--testonly', action='store_true', default=False,
@@ -32,7 +32,7 @@ def parseCommandLine():
                         help='Print submission script on stdout')
     args = parser.parse_args()
 
-    submitYamlJobs(args.jobFile, args.clusterParamsFile,
+    submitYamlJobs(args.jobfile, args.clusterparamsfile,
                    testonly=args.testonly, verbose=args.verbose)
 
 

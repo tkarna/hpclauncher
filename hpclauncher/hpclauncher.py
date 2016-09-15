@@ -29,7 +29,7 @@ def parse_jobs_from_yaml(yamlfile):
     global_keys = [k for k in kwargs if k[:4] != 'job_']
     globals = OrderedDict([(k, kwargs[k]) for k in kwargs if k in global_keys])
     # global tags may be used in job or task defs, store in clusterParams
-    clusterparams.getArgs().update(globals)
+    clusterparams.get_args().update(globals)
     # all other sub-dicts are jobs
     jobs = OrderedDict([(k, kwargs[k]) for k in kwargs if k not in global_keys])
     # parse dict to jobs
