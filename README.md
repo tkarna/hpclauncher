@@ -16,14 +16,14 @@ Define a yaml cluster configure file and copy it under
 
     ~/.hpclauncher/local_cluster.yaml
 
-For example cluster parameter files see [examples/cluster_config](https://bitbucket.org/tkarna/batchscriplib/src/HEAD/examples/cluster_config/?at=master).
-Cluster configure file can also be overriden with `BATCHSCRIPTLIB_CLUSTER` environment variable.
+For example cluster parameter files see [examples/cluster_config](https://github.com/tkarna/hpclauncher/src/HEAD/examples/cluster_config/?at=master).
+Cluster configure file can also be overriden with `HPCLAUNCHERCLUSTER` environment variable.
 
 You can now submit jobs from yaml files with
 
     submitYAMLJob.py myjob.yaml
 
-For example job files see [examples/job_config](https://bitbucket.org/tkarna/batchscriplib/src/HEAD/examples/job_config/?at=master).
+For example job files see [examples/job_config](https://github.com/tkarna/hpclauncher/src/HEAD/examples/job_config/?at=master).
 
 For testing purposes, adding `-t` will only print the submission script without submitting it.
 
