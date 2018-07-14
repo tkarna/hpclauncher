@@ -8,7 +8,7 @@ from batchScriptLib import *
 
 def processRun(runTag, parentjob=None, parentmode=None, testonly=True,
                verbose=False):
-    print 'Setting up', runTag
+    print('Setting up {:}'.format(runTag))
 
     queue = 'development'
 
@@ -22,7 +22,7 @@ def processRun(runTag, parentjob=None, parentmode=None, testonly=True,
     job = batchJob(name, queue, nproc, timerequest(0, 15, 0), log,
                    rundirectory=rundir, command=cmd)
     runID = launchJob(job, testonly, verbose)
-    print 'submitted run job:', runTag, runID
+    print('submitted run job: {:} {:}'.format(runTag, runID))
 
 
 # -----------------------------------------------------------------------------

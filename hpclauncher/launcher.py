@@ -35,14 +35,14 @@ def _launch_job(name, content, submitexec, managertype, rundir=None,
     """
     if testonly:
         # print to stdout and return
-        print content
+        print(content)
         return 0
     elif verbose:
-        print content
+        print(content)
     if rundir:
         # change to rundir, store current dir
         if verbose:
-            print 'chdir', rundir
+            print('chdir {:}'.format(rundir))
         curdir = os.getcwd()
         os.chdir(rundir)
     # write out temp submission file
@@ -52,25 +52,25 @@ def _launch_job(name, content, submitexec, managertype, rundir=None,
     try:
         call = [submitexec, subfile]
         if verbose:
-            print 'excecuting {:}'.format(' '.join(call))
+            print('excecuting {:}'.format(' '.join(call)))
         if managertype == 'bash' and logfile is not None:
             with open(logfile, 'w') as logstream:
                 output = subprocess.check_call(call, stdout=logstream,
                                                stderr=subprocess.STDOUT)
         else:
-            output = subprocess.check_output(call)
+            output = subprocess.check_output(call).decode('ascii')
     except Exception as e:
-        print e
+        print(e)
         raise e
     if rundir:
         # change back to currect directory
         if verbose:
-            print 'chdir', curdir
+            print('chdir {:}'.format(curdir))
         os.chdir(curdir)
     # print launcher output to stdout
-    print output
+    print(output)
     jobid = _parse_job_id(output, managertype)
-    print 'Parsed Job ID:', jobid
+    print('Parsed Job ID: {:}'.format(jobid))
     return jobid
 
 
@@ -79,7 +79,7 @@ def _write_script_file(subfile, content, verbose=False):
     Stores content to a submission script file.
     """
     if verbose:
-        print 'writing to', subfile
+        print('writing to {:}'.format(subfile))
     fid = open(subfile, 'w')
     fid.write(content)
     fid.close()

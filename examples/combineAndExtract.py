@@ -8,7 +8,7 @@ from batchScriptLib import *
 
 def processRun(runTag, parentjob=None, parentmode=None, testonly=True,
                verbose=False):
-    print 'Setting up', runTag
+    print('Setting up {:}'.format(runTag))
 
     queue = 'normal'
 
@@ -33,7 +33,7 @@ def processRun(runTag, parentjob=None, parentmode=None, testonly=True,
     combJob.appendTask(t2, threaded=True)
     combJob.appendTask(t3, threaded=True)
     combID = launchJob(combJob, testonly, verbose)
-    print 'submitted comb job:', runTag, combID
+    print('submitted comb job: {:} {:}'.format(runTag, combID))
 
     # --- extract ---
     name = 'e_'+shortname
@@ -69,7 +69,7 @@ def processRun(runTag, parentjob=None, parentmode=None, testonly=True,
     masterJob.appendTask(taskExtractAUV(runTag), threaded=False)
 
     extrID = launchJob(masterJob, testonly=testonly, verbose=verbose)
-    print 'submitted extr job:', runTag, extrID
+    print('submitted extr job: {:} {:}'.format(runTag, extrID))
 
 # -----------------------------------------------------------------------------
 # Command line interface

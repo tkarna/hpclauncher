@@ -70,8 +70,8 @@ or by setting the parameters directly
 clusterParams.initializeWithArgs(submitexec='sbatch', ...)
 
 """
-            print msg.format(env_var=CLUSTERPARAM_ENV_VAR,
-                             user_file=CLUSTERPARAM_USERFILE)
+            print(msg.format(env_var=CLUSTERPARAM_ENV_VAR,
+                             user_file=CLUSTERPARAM_USERFILE))
             raise Exception('clusterparams must be initialized')
 
     def __getitem__(self, key):

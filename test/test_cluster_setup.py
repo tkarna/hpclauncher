@@ -15,8 +15,8 @@ class TestBase(unittest.TestCase):
             diff = [p + '\n' for p in diff]
             self.assertTrue(len(diff) == 0)
         except AssertionError as e:
-            print 'string mismatch:'
-            print ''.join(diff)
+            print('string mismatch:')
+            print(''.join(diff))
             raise e
 
 
